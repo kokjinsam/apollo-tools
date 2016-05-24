@@ -1,6 +1,6 @@
 {
   "name": "apollo-tools",
-  "version": "0.0.1",
+  "version": "0.0.13",
   "homepage": "https://github.com/sammkj/apollo-tools",
   "repository": {
     "type": "git",
@@ -31,10 +31,10 @@
     "eslint-plugin-jsx-a11y": "^1.2.0",
     "eslint-plugin-react": "^5.1.1"
   },
-  "peerDependencies": {
+  "dependencies": {
     "apollo-client": "^0.3.9",
     "apollo-server": "^0.1.1",
     "express": "^4.13.4",
-    "http-proxy-middleware": "^0.14.0"
+    "http-proxy-middleware": "^0.15.0"
   }
 }
