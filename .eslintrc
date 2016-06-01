@@ -8,6 +8,10 @@
     "node": true
   },
 
+  "globals": {
+    Package: true,
+  },
+
   "ecmaFeatures": {
     "arrowFunctions": true,
     "binaryLiterals": true,
@@ -33,5 +37,12 @@
     "superInFunctions": true,
     "templateStrings": true,
     "unicodeCodePointEscapes": true
+  },
+
+  "rules": {
+    "dot-notation": 0,
+    "no-underscore-dangle": 0,
+    "no-param-reassign": 0,
+    "global-require": 0
   }
 }

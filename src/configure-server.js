@@ -1,5 +1,4 @@
-function configureGraphQLServer(options) {
-  /* eslint-disable global-require*/
+function configureGraphQLServer(options = {}) {
   const express = require('express');
   const apolloServer = require('apollo-server').apolloServer;
   const proxyMiddleware = require('http-proxy-middleware');

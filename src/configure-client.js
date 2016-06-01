@@ -1,7 +1,7 @@
 import ApolloClient, { createNetworkInterface } from 'apollo-client';
 import { addTypenameToSelectionSet } from 'apollo-client/queries/queryTransform';
 
-function configureGraphQLClient(options) {
+function configureGraphQLClient(options = {}) {
   const Meteor = Package['meteor'].Meteor;
   const Accounts = Package['accounts-base'].Accounts;
 
@@ -15,13 +15,23 @@ function configureGraphQLClient(options) {
     throw new Error(error);
   }
 
+  /**
+   * Default to using Mongo _id
+   * For query, you need to return _id
+   */
+  const defaultDataIfFromObject = (result) => {
+    if (result.id && result.__typename) {
+      return result.__typename + result.id;
+    }
+  };
+
   const {
     urlName = 'graphql',
     auth = false,
+    dataIdFromObject = defaultDataIfFromObject,
     ...others,
   } = options;
 
-  /* eslint-disable no-underscore-dangle */
   // this is important for SSR;
   const fullUrl = Meteor.absoluteUrl(urlName);
   const _networkInterface = createNetworkInterface(fullUrl);
@@ -38,7 +48,6 @@ function configureGraphQLClient(options) {
         }
 
         if (!request.options.headers) {
-          /* eslint-disable no-param-reassign */
           request.options.headers = new Headers();
         }
 
@@ -52,13 +61,7 @@ function configureGraphQLClient(options) {
   const Client = new ApolloClient({
     networkInterface: _networkInterface,
     queryTransformer: addTypenameToSelectionSet,
-    dataIdFromObject: (result) => {
-      if (result.id && result.__typename) {
-        return result.__typename + result.id;
-      }
-
-      return null;
-    },
+    dataIdFromObject,
     ...others,
   });
 
