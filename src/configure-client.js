@@ -19,16 +19,16 @@ function configureGraphQLClient(options = {}) {
    * Default to using Mongo _id
    * For query, you need to return _id
    */
-  const defaultDataIfFromObject = (result) => {
-    if (result.id && result.__typename) {
-      return result.__typename + result.id;
+  const defaultDataIdFromObject = (result) => {
+    if (result._id && result.__typename) {
+      return result.__typename + result._id;
     }
   };
 
   const {
     urlName = 'graphql',
     auth = false,
-    dataIdFromObject = defaultDataIfFromObject,
+    dataIdFromObject = defaultDataIdFromObject,
     ...others,
   } = options;
 
