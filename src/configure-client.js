@@ -1,30 +1,35 @@
 import ApolloClient, { createNetworkInterface } from 'apollo-client';
+import { addTypenameToSelectionSet } from 'apollo-client/queries/queryTransform';
 
-function configureGraphQLClient({
-  url = 'graphql',
-  auth = false,
-}) {
-  if (!Package['meteor']) {
+function configureGraphQLClient(options) {
+  const Meteor = Package['meteor'].Meteor;
+  const Accounts = Package['accounts-base'].Accounts;
+
+  if (!Meteor) {
     const error = 'Meteor package is missing';
     throw new Error(error);
   }
 
-  if (!Package['accounts-base']) {
+  if (!Accounts) {
     const error = 'accounts-base package is missing';
     throw new Error(error);
   }
 
-  const Meteor = Package['meteor'].Meteor;
+  const {
+    urlName = 'graphql',
+    auth = false,
+    ...others,
+  } = options;
+
+  /* eslint-disable no-underscore-dangle */
   // this is important for SSR;
-  const fullUrl = Meteor.absoluteUrl(url);
-  const networkInterface = createNetworkInterface(fullUrl);
+  const fullUrl = Meteor.absoluteUrl(urlName);
+  const _networkInterface = createNetworkInterface(fullUrl);
 
-  const Accounts = Package['accounts-base'].Accounts;
-
+  // this part is from meteor-integration
   if (auth) {
-    networkInterface.use([{
+    _networkInterface.use([{
       applyMiddleware(request, next) {
-        /* eslint-disable no-underscore-dangle */
         const currentUserToken = Accounts._storedLoginToken();
 
         if (!currentUserToken) {
@@ -45,7 +50,16 @@ function configureGraphQLClient({
   }
 
   const Client = new ApolloClient({
-    networkInterface,
+    networkInterface: _networkInterface,
+    queryTransformer: addTypenameToSelectionSet,
+    dataIdFromObject: (result) => {
+      if (result.id && result.__typename) {
+        return result.__typename + result.id;
+      }
+
+      return null;
+    },
+    ...others,
   });
 
   return Client;
